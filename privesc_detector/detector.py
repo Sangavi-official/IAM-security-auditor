@@ -1,37 +1,5 @@
 """
 detector.py
-
-WHAT THIS MODULE ACTUALLY DOES (read this before the code):
-
-Cloudsplaining already has a built-in privilege-escalation detector
-(`PolicyDocument.allows_privilege_escalation`) covering dozens of known AWS
-IAM escalation techniques (the Rhino Security Labs / pathfinding.cloud
-method set -- see cloudsplaining/shared/constants.py::PRIVILEGE_ESCALATION_METHODS).
-
-Before building anything, this project tested that detector directly and
-found a real, reproducible gap: for any technique that requires
-`iam:PassRole` (e.g. CreateEC2WithExistingIP, PassExistingRoleToNewLambda...),
-Cloudsplaining only flags the technique if the PassRole statement's
-Resource is a literal "*". If the Resource is instead something like
-
-    arn:aws:iam::123456789012:role/*
-
-Cloudsplaining does NOT flag it -- even though this resource pattern still
-lets the principal pass ANY role in the account, which is the same
-practical blast radius as an unrestricted "*". This was verified with a
-minimal reproduction, not assumed:
-
-    PassRole Resource = "*"                              -> flagged
-    PassRole Resource = "arn:...:role/*"                 -> NOT flagged
-    PassRole Resource = "arn:...:role/prod-deploy-role"  -> correctly not flagged (this one IS scoped)
-
-This module finds exactly that blind spot: PassRole-based escalation
-techniques where the PassRole resource pattern is "effectively
-unrestricted" (its final path segment is a bare wildcard) but
-Cloudsplaining's own check didn't already catch it for this policy.
-
-It deliberately does NOT re-implement checks Cloudsplaining already does
-well -- only the specific gap above.
 """
 
 from __future__ import annotations

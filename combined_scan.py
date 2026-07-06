@@ -2,25 +2,9 @@
 """
 combined_scan.py
 
-IAM Security Auditor -- Cloudsplaining + PassRole blind-spot detector.
+IAM Security Auditor -- Cloudsplaining + PassRole blind-spot detector
+This runs two layers of analysis against an IAM policy file
 
-This runs two layers of analysis against an IAM policy file:
-
-  1. Cloudsplaining (Salesforce, BSD-3-Clause license) -- the full suite of
-     least-privilege checks, including its own built-in privilege-escalation
-     detector covering dozens of known AWS IAM escalation techniques.
-
-  2. privesc_detector (original addition in this project) -- specifically
-     targets a verified gap in Cloudsplaining's PassRole handling: it only
-     flags PassRole-based escalation techniques when the Resource is a
-     literal "*". Resource patterns like "role/*" (any role in the account,
-     same real-world risk) are missed. See privesc_detector/detector.py for
-     the full writeup and the reproduction that verified this.
-
-Usage:
-    python3 combined_scan.py --input-file sample_policies/privesc_passrole_ec2.json
-    python3 combined_scan.py --input-dir sample_policies/
-    python3 combined_scan.py --input-dir sample_policies/ --output report.json
 """
 
 import argparse
